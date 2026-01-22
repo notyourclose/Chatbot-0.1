@@ -1,37 +1,53 @@
 import streamlit as st
 import requests
 import time
+from datetime import datetime
 
 # Page config
 st.set_page_config(
-    page_title="AI Chatbot | Kavishka Dileepa",
+    page_title="AI Chatbot - Kavishka Dileepa",
     page_icon="🤖",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
-# Custom CSS - Modern Professional Design
+# Custom CSS - ChatGPT Style
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
     * {
-        font-family: 'Poppins', sans-serif;
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+        font-family: 'Inter', sans-serif;
     }
 
-    /* Hide Streamlit elements */
+    /* Hide default Streamlit elements */
     #MainMenu, footer, header {visibility: hidden;}
     .stDeployButton {display: none;}
 
-    /* Main App Background */
+    /* Main Background */
     .stApp {
-        background: #0a0e27;
-        background-image: 
-            radial-gradient(at 20% 30%, rgba(88, 86, 214, 0.15) 0px, transparent 50%),
-            radial-gradient(at 80% 70%, rgba(74, 144, 226, 0.15) 0px, transparent 50%);
+        background: #343541;
+    }
+
+    /* Sidebar Styling */
+    [data-testid="stSidebar"] {
+        background: #202123;
+        border-right: 1px solid #444654;
+    }
+
+    [data-testid="stSidebar"] .stButton button {
+        background: transparent;
+        border: 1px solid #444654;
+        color: white;
+        border-radius: 6px;
+        padding: 10px 16px;
+        width: 100%;
+        text-align: left;
+        transition: all 0.2s;
+    }
+
+    [data-testid="stSidebar"] .stButton button:hover {
+        background: #2a2b32;
     }
 
     /* Main Container */
@@ -40,172 +56,161 @@ st.markdown("""
         max-width: 100%;
     }
 
-    /* Header Section */
-    .header-container {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 2rem 3rem;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    /* Header */
+    .chat-header {
+        background: #343541;
+        border-bottom: 1px solid #444654;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
         position: sticky;
         top: 0;
-        z-index: 1000;
+        z-index: 100;
     }
 
-    .header-content {
-        max-width: 1400px;
-        margin: 0 auto;
-        display: flex;
-        justify-content: space-between;
+    .chat-header h1 {
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .chat-header .status {
+        display: inline-flex;
         align-items: center;
-    }
-
-    .logo-section {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .logo-icon {
-        width: 50px;
-        height: 50px;
-        background: white;
+        gap: 6px;
+        background: #19c37d;
+        color: white;
+        padding: 4px 12px;
         border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .status-dot {
+        width: 6px;
+        height: 6px;
+        background: white;
+        border-radius: 50%;
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    /* Welcome Screen */
+    .welcome-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 60vh;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .welcome-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #10a37f 0%, #1a7f64 100%);
+        border-radius: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 2rem;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        font-size: 40px;
+        margin-bottom: 20px;
+        box-shadow: 0 8px 24px rgba(16, 163, 127, 0.3);
     }
 
-    .logo-text h1 {
+    .welcome-title {
         color: white;
-        font-size: 1.8rem;
-        font-weight: 700;
-        margin: 0;
-    }
-
-    .logo-text p {
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 0.9rem;
-        margin: 0;
-        font-weight: 400;
-    }
-
-    .header-stats {
-        display: flex;
-        gap: 2rem;
-        color: white;
-    }
-
-    .stat-item {
-        text-align: center;
-    }
-
-    .stat-number {
-        font-size: 1.5rem;
-        font-weight: 700;
-    }
-
-    .stat-label {
-        font-size: 0.8rem;
-        opacity: 0.9;
-    }
-
-    /* Chat Container */
-    .chat-container {
-        max-width: 1200px;
-        margin: 2rem auto;
-        padding: 0 2rem;
-        min-height: 60vh;
-    }
-
-    /* Welcome Banner */
-    .welcome-banner {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-        border: 2px solid rgba(102, 126, 234, 0.3);
-        border-radius: 20px;
-        padding: 3rem;
-        text-align: center;
-        margin-bottom: 2rem;
-        backdrop-filter: blur(10px);
-    }
-
-    .welcome-banner h2 {
-        color: #667eea;
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 1rem;
-    }
-
-    .welcome-banner p {
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 1.1rem;
-        line-height: 1.8;
-    }
-
-    .feature-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-        margin-top: 2rem;
-    }
-
-    .feature-box {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 15px;
-        padding: 1.5rem;
-        text-align: center;
-        transition: all 0.3s ease;
-    }
-
-    .feature-box:hover {
-        background: rgba(102, 126, 234, 0.1);
-        border-color: rgba(102, 126, 234, 0.3);
-        transform: translateY(-5px);
-    }
-
-    .feature-icon {
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .feature-box h3 {
-        color: white;
-        font-size: 1.1rem;
+        font-size: 32px;
         font-weight: 600;
-        margin-bottom: 0.5rem;
+        margin-bottom: 12px;
     }
 
-    .feature-box p {
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 0.9rem;
+    .welcome-subtitle {
+        color: #acacbe;
+        font-size: 16px;
+        margin-bottom: 40px;
+        max-width: 500px;
+    }
+
+    .example-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+        max-width: 900px;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .example-card {
+        background: #444654;
+        border: 1px solid #565869;
+        border-radius: 12px;
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: left;
+    }
+
+    .example-card:hover {
+        background: #4a4b5a;
+        border-color: #10a37f;
+        transform: translateY(-2px);
+    }
+
+    .example-icon {
+        font-size: 24px;
+        margin-bottom: 12px;
+    }
+
+    .example-title {
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+
+    .example-desc {
+        color: #acacbe;
+        font-size: 12px;
     }
 
     /* Chat Messages */
     .stChatMessage {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    /* User Message Styling */
-    [data-testid="stChatMessageContent"] {
-        color: white;
+        background: #444654;
+        border: none;
+        border-radius: 0;
+        padding: 24px;
+        margin: 0;
     }
 
     .stChatMessage[data-testid*="user"] {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
+        background: #343541;
     }
 
-    /* Assistant Message Styling */
-    .stChatMessage[data-testid*="assistant"] {
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(102, 126, 234, 0.2);
+    [data-testid="stChatMessageContent"] {
+        color: white;
+        font-size: 15px;
+        line-height: 1.6;
+    }
+
+    /* Avatar Styling */
+    [data-testid="stChatMessageAvatarAssistant"] {
+        background: linear-gradient(135deg, #10a37f 0%, #1a7f64 100%);
+        width: 32px;
+        height: 32px;
+    }
+
+    [data-testid="stChatMessageAvatarUser"] {
+        background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+        width: 32px;
+        height: 32px;
     }
 
     /* Chat Input */
@@ -214,201 +219,176 @@ st.markdown("""
         bottom: 0;
         left: 0;
         right: 0;
-        background: #0a0e27;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 1.5rem;
-        z-index: 999;
+        background: #343541;
+        border-top: 1px solid #444654;
+        padding: 20px;
+        z-index: 100;
     }
 
     .stChatInput > div {
-        max-width: 1200px;
+        max-width: 768px;
         margin: 0 auto;
-        background: rgba(255, 255, 255, 0.05);
-        border: 2px solid rgba(102, 126, 234, 0.3);
-        border-radius: 30px;
-        padding: 0.5rem 1.5rem;
-        backdrop-filter: blur(10px);
+        background: #40414f;
+        border: 1px solid #565869;
+        border-radius: 12px;
+        box-shadow: 0 0 0 1px transparent;
     }
 
     .stChatInput input {
         background: transparent;
         border: none;
         color: white;
-        font-size: 1rem;
+        font-size: 15px;
+        padding: 12px 16px;
     }
 
     .stChatInput input::placeholder {
-        color: rgba(255, 255, 255, 0.5);
+        color: #8e8ea0;
     }
 
-    /* Avatar Styling */
-    [data-testid="stChatMessageAvatarUser"] {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .stChatInput input:focus {
+        box-shadow: 0 0 0 2px #10a37f;
     }
 
-    [data-testid="stChatMessageAvatarAssistant"] {
-        background: linear-gradient(135deg, #4a90e2 0%, #5856d6 100%);
+    /* Sidebar Content */
+    .sidebar-section {
+        padding: 12px;
+        margin: 12px 0;
     }
 
-    /* Sidebar */
-    [data-testid="stSidebar"] {
-        background: rgba(10, 14, 39, 0.95);
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .sidebar-card {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 15px;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .sidebar-card h3 {
-        color: #667eea;
-        font-size: 1.2rem;
+    .sidebar-title {
+        color: #8e8ea0;
+        font-size: 11px;
         font-weight: 600;
-        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        padding: 0 8px;
     }
 
-    .sidebar-card p {
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 0.9rem;
-        line-height: 1.6;
-    }
-
-    /* Button Styling */
-    .stButton button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .sidebar-item {
         color: white;
-        border: none;
-        border-radius: 12px;
-        padding: 0.8rem 2rem;
+        padding: 10px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        margin: 4px 0;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .sidebar-item:hover {
+        background: #2a2b32;
+    }
+
+    .user-profile {
+        position: absolute;
+        bottom: 20px;
+        left: 12px;
+        right: 12px;
+        background: #2a2b32;
+        border-radius: 8px;
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .user-avatar {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
         font-weight: 600;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
     }
 
-    .stButton button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    .user-info {
+        flex: 1;
     }
 
-    /* Animations */
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
+    .user-name {
+        color: white;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .user-plan {
+        color: #8e8ea0;
+        font-size: 12px;
+    }
+
+    /* Typing Indicator */
+    .typing-indicator {
+        display: flex;
+        gap: 4px;
+        padding: 8px 0;
+    }
+
+    .typing-dot {
+        width: 8px;
+        height: 8px;
+        background: #8e8ea0;
+        border-radius: 50%;
+        animation: typing 1.4s infinite;
+    }
+
+    .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    @keyframes typing {
+        0%, 60%, 100% {
             transform: translateY(0);
+            opacity: 0.7;
+        }
+        30% {
+            transform: translateY(-8px);
+            opacity: 1;
         }
     }
 
-    .stChatMessage {
-        animation: fadeIn 0.4s ease-out;
-    }
-
-    /* Responsive Design */
+    /* Responsive */
     @media (max-width: 768px) {
-        .header-container {
-            padding: 1.5rem 1rem;
+        .welcome-title {
+            font-size: 24px;
         }
 
-        .header-content {
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .header-stats {
-            gap: 1rem;
-        }
-
-        .logo-text h1 {
-            font-size: 1.4rem;
-        }
-
-        .welcome-banner {
-            padding: 2rem 1rem;
-        }
-
-        .welcome-banner h2 {
-            font-size: 1.8rem;
-        }
-
-        .chat-container {
-            padding: 0 1rem;
-            margin-bottom: 100px;
-        }
-
-        .feature-grid {
+        .example-cards {
             grid-template-columns: 1fr;
         }
-    }
 
-    /* Loading Spinner */
-    .stSpinner > div {
-        border-top-color: #667eea;
-    }
-
-    /* Scrollbar */
-    ::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05);
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: rgba(102, 126, 234, 0.5);
-        border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        background: rgba(102, 126, 234, 0.7);
+        .stChatMessage {
+            padding: 16px;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
 
 # Header
 st.markdown("""
-<div class="header-container">
-    <div class="header-content">
-        <div class="logo-section">
-            <div class="logo-icon">🤖</div>
-            <div class="logo-text">
-                <h1>AI Chatbot</h1>
-                <p>Powered by Kavishka Dileepa</p>
-            </div>
-        </div>
-        <div class="header-stats">
-            <div class="stat-item">
-                <div class="stat-number">24/7</div>
-                <div class="stat-label">Available</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">⚡</div>
-                <div class="stat-label">Fast Response</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">🔒</div>
-                <div class="stat-label">Secure</div>
-            </div>
-        </div>
+<div class="chat-header">
+    <h1>🤖 AI Chatbot</h1>
+    <div class="status">
+        <div class="status-dot"></div>
+        Online
     </div>
 </div>
 """, unsafe_allow_html=True)
 
 
-# Generate response function
-def generate_response(prompt, conversation_history):
+# Generate AI Response
+def generate_response(prompt):
     try:
         if "HF_TOKEN" in st.secrets:
             API_URL = "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill"
-            headers = {"Authorization": f"Bearer {st.secrets['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']}"}
+            headers = {"Authorization": f"Bearer {st.secrets['HF_TOKEN']}"}
             payload = {"inputs": prompt, "parameters": {"max_length": 100, "temperature": 0.7}}
             response = requests.post(API_URL, headers=headers, json=payload, timeout=30)
             if response.status_code == 200:
@@ -426,137 +406,136 @@ def generate_response(prompt, conversation_history):
             result = response.json()
             if isinstance(result, list) and len(result) > 0:
                 return result[0].get('generated_text', '').strip()
-        elif response.status_code == 503:
-            time.sleep(2)
-            response = requests.post(API_URL, headers={}, json=payload, timeout=30)
-            if response.status_code == 200:
-                result = response.json()
-                if isinstance(result, list) and len(result) > 0:
-                    return result[0].get('generated_text', '').strip()
     except:
         pass
 
     prompt_lower = prompt.lower()
 
     if any(word in prompt_lower for word in ['hello', 'hi', 'hey', 'greetings']):
-        return "Hello! 👋 I'm your AI assistant. How can I help you today?"
+        return "Hello! 👋 It's great to meet you. I'm here to help with any questions or tasks you have. What would you like to talk about?"
     elif any(word in prompt_lower for word in ['how are you', 'how r u', 'whats up']):
-        return "I'm doing great, thank you for asking! 😊 I'm here to help you with any questions you have."
+        return "I'm doing wonderfully, thank you for asking! As an AI, I'm always ready to assist. How can I help you today?"
     elif any(word in prompt_lower for word in ['your name', 'who are you', 'what are you']):
-        return "I'm an AI chatbot created by Kavishka Dileepa. I'm designed to assist you with information, answer questions, and have meaningful conversations! 🤖"
-    elif any(word in prompt_lower for word in ['bye', 'goodbye', 'see you']):
-        return "Goodbye! 👋 It was nice chatting with you. Feel free to come back anytime you need help!"
+        return "I'm an AI assistant created by Kavishka Dileepa. I'm designed to help answer questions, provide information, and have engaging conversations. What would you like to know?"
     elif any(word in prompt_lower for word in ['thank', 'thanks']):
-        return "You're very welcome! 😊 I'm always happy to help. Is there anything else you'd like to know?"
+        return "You're very welcome! I'm happy I could help. Is there anything else you'd like to discuss? 😊"
+    elif any(word in prompt_lower for word in ['bye', 'goodbye', 'see you']):
+        return "Goodbye! It was a pleasure chatting with you. Feel free to return anytime you need assistance. Have a great day! 👋"
     elif any(word in prompt_lower for word in ['help', 'what can you do']):
-        return "I can help you with many things! 🌟 I can answer questions, provide information, have conversations, and assist with various topics. Just ask me anything!"
+        return "I can assist you with:\n\n• Answering questions on various topics\n• Providing explanations and information\n• Having natural conversations\n• Helping with problem-solving\n• And much more!\n\nJust ask me anything you'd like to know!"
     elif '?' in prompt:
-        return f"That's an interesting question! While I'm currently in simplified mode, I can still try to help. Could you provide more details or rephrase your question? 🤔"
+        return "That's an interesting question! While I'm currently in simplified mode, I'd love to help you explore this topic. Could you provide more context or rephrase your question?"
     else:
-        return "I understand what you're saying! I'm here to help with questions and conversations. Feel free to ask me anything specific! 💬"
+        return "I understand what you're saying. I'm here to help with questions, provide information, or just have a conversation. What would you like to talk about?"
 
 
-# Initialize chat
+# Initialize session state
 if "messages" not in st.session_state:
     st.session_state.messages = []
+if "chat_count" not in st.session_state:
+    st.session_state.chat_count = 0
 
-# Main content area
-st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+# Sidebar
+with st.sidebar:
+    st.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
 
-# Show welcome banner if no messages
+    if st.button("➕ New Chat", use_container_width=True):
+        st.session_state.messages = []
+        st.session_state.chat_count += 1
+        st.rerun()
+
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-title">Recent Chats</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-item">💬 Current Conversation</div>', unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    st.markdown("### ⚙️ Settings")
+    if st.button("🗑️ Clear All Chats", use_container_width=True):
+        st.session_state.messages = []
+        st.rerun()
+
+    st.markdown("---")
+
+    st.markdown("""
+    <div class="user-profile">
+        <div class="user-avatar">U</div>
+        <div class="user-info">
+            <div class="user-name">User</div>
+            <div class="user-plan">Free Plan</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("<br><br><br>", unsafe_allow_html=True)
+
+    st.markdown("""
+    <div style='text-align: center; color: #8e8ea0; font-size: 12px; padding: 20px;'>
+        <p>Made with ❤️ by<br><strong style='color: #10a37f;'>Kavishka Dileepa</strong></p>
+        <p style='margin-top: 8px;'>© 2026 All rights reserved</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+# Main Chat Area
 if len(st.session_state.messages) == 0:
     st.markdown("""
-    <div class="welcome-banner">
-        <h2>👋 Welcome to AI Chatbot</h2>
-        <p>Your intelligent conversation partner, available 24/7 to answer questions, provide information, and engage in meaningful conversations.</p>
+    <div class="welcome-container">
+        <div class="welcome-icon">🤖</div>
+        <div class="welcome-title">How can I help you today?</div>
+        <div class="welcome-subtitle">
+            I'm here to answer questions, provide information, and have conversations. Just type your message below!
+        </div>
 
-        <div class="feature-grid">
-            <div class="feature-box">
-                <div class="feature-icon">⚡</div>
-                <h3>Lightning Fast</h3>
-                <p>Get instant responses to your questions</p>
+        <div class="example-cards">
+            <div class="example-card">
+                <div class="example-icon">💡</div>
+                <div class="example-title">Explain concepts simply</div>
+                <div class="example-desc">Break down complex topics into easy-to-understand explanations</div>
             </div>
-            <div class="feature-box">
-                <div class="feature-icon">🎯</div>
-                <h3>Accurate Answers</h3>
-                <p>Reliable and helpful information</p>
+            <div class="example-card">
+                <div class="example-icon">🎯</div>
+                <div class="example-title">Get quick answers</div>
+                <div class="example-desc">Fast and accurate responses to your questions</div>
             </div>
-            <div class="feature-box">
-                <div class="feature-icon">💡</div>
-                <h3>Smart AI</h3>
-                <p>Powered by advanced AI technology</p>
+            <div class="example-card">
+                <div class="example-icon">📚</div>
+                <div class="example-title">Learn something new</div>
+                <div class="example-desc">Explore any subject with detailed information</div>
             </div>
-            <div class="feature-box">
-                <div class="feature-icon">🔒</div>
-                <h3>Secure & Private</h3>
-                <p>Your conversations are safe</p>
+            <div class="example-card">
+                <div class="example-icon">🤝</div>
+                <div class="example-title">Have a conversation</div>
+                <div class="example-desc">Natural dialogue on any topic you're interested in</div>
             </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-# Display messages
+# Display chat messages
 for message in st.session_state.messages:
-    with st.chat_message(message["role"], avatar="👤" if message["role"] == "user" else "🤖"):
+    with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-st.markdown('</div>', unsafe_allow_html=True)
-
 # Chat input
-if prompt := st.chat_input("💬 Type your message here..."):
+if prompt := st.chat_input("Message AI Chatbot..."):
+    # Add user message
     st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user", avatar="👤"):
+    with st.chat_message("user"):
         st.markdown(prompt)
 
-    with st.chat_message("assistant", avatar="🤖"):
-        with st.spinner("🤔 Thinking..."):
-            response = generate_response(prompt, st.session_state.messages)
+    # Generate and display assistant response
+    with st.chat_message("assistant"):
+        with st.spinner(""):
+            st.markdown("""
+            <div class="typing-indicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+            """, unsafe_allow_html=True)
+            time.sleep(1)
+            response = generate_response(prompt)
             st.markdown(response)
 
     st.session_state.messages.append({"role": "assistant", "content": response})
-
-# Sidebar
-with st.sidebar:
-    st.markdown("""
-    <div class="sidebar-card">
-        <h3>✨ Features</h3>
-        <p>
-        🎯 Natural conversations<br>
-        🧠 Context-aware responses<br>
-        ⚡ Lightning-fast replies<br>
-        🌍 Available 24/7<br>
-        🔒 Secure & private
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown("""
-    <div class="sidebar-card">
-        <h3>💡 Pro Tips</h3>
-        <p>
-        • Ask clear, specific questions<br>
-        • Use natural language<br>
-        • Be conversational<br>
-        • Explore different topics
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    if st.button("🔄 Clear Chat", use_container_width=True):
-        st.session_state.messages = []
-        st.rerun()
-
-    st.markdown("""
-    <div class="sidebar-card">
-        <h3>🚀 Upgrade</h3>
-        <p>Add your <strong>HF_TOKEN</strong> in Streamlit Secrets for advanced AI-powered responses!</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown("---")
-    st.markdown("""
-    <div style='text-align: center; color: rgba(255, 255, 255, 0.6); font-size: 0.85rem; padding: 1rem;'>
-        <p>Made with ❤️ by<br><strong style='color: #667eea;'>Kavishka Dileepa</strong></p>
-        <p style='margin-top: 0.5rem;'>© 2026 All rights reserved</p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.rerun()
