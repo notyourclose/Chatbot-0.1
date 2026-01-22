@@ -9,7 +9,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Complete ChatGPT.com interface
+# Complete ChatGPT.com interface - FIXED alignment and responsive
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Sohne:wght@300;400;500;600;700&display=swap');
@@ -74,14 +74,14 @@ st.markdown("""
     margin: 16px 0;
 }
 
-/* Main container */
+/* Main container - FIXED alignment */
 .main .block-container {
-    padding: 0;
-    max-width: 100%;
-    padding-bottom: 140px;
+    padding: 0 !important;
+    max-width: 100% !important;
+    padding-bottom: 140px !important;
 }
 
-/* Header */
+/* Header - FIXED alignment */
 .chat-header {
     position: sticky;
     top: 0;
@@ -92,6 +92,8 @@ st.markdown("""
     display: flex;
     align-items: center;
     justify-content: space-between;
+    width: 100%;
+    margin: 0;
 }
 
 .chat-header-title {
@@ -111,7 +113,7 @@ st.markdown("""
     border-radius: 4px;
 }
 
-/* Chat messages */
+/* Chat messages - FIXED alignment */
 .stChatMessage {
     background: transparent !important;
     border: none !important;
@@ -155,7 +157,7 @@ st.markdown("""
     border-radius: 2px;
 }
 
-/* Chat input - ChatGPT style */
+/* Chat input - FIXED alignment */
 .stChatInput {
     position: fixed !important;
     bottom: 0 !important;
@@ -165,6 +167,7 @@ st.markdown("""
     border-top: 1px solid rgba(255,255,255,0.1) !important;
     padding: 16px !important;
     z-index: 1000 !important;
+    width: 100% !important;
 }
 
 .stChatInput > div {
@@ -222,7 +225,7 @@ st.markdown("""
     background: rgba(255,255,255,0.1) !important;
 }
 
-/* Welcome screen */
+/* Welcome screen - FIXED centering */
 .welcome-container {
     display: flex;
     flex-direction: column;
@@ -233,6 +236,7 @@ st.markdown("""
     text-align: center;
     max-width: 768px;
     margin: 0 auto;
+    width: 100%;
 }
 
 .welcome-title {
@@ -242,6 +246,7 @@ st.markdown("""
     margin-bottom: 8px;
     line-height: 1.2;
     letter-spacing: -0.02em;
+    width: 100%;
 }
 
 .welcome-subtitle {
@@ -249,6 +254,8 @@ st.markdown("""
     font-size: 16px;
     margin-bottom: 32px;
     line-height: 1.6;
+    width: 100%;
+    max-width: 600px;
 }
 
 .example-prompts {
@@ -357,33 +364,13 @@ st.markdown("""
     font-size: 12px;
 }
 
-/* Icon buttons */
-.btn-with-icon {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.btn-icon {
-    width: 16px;
-    height: 16px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.btn-icon svg {
-    width: 100%;
-    height: 100%;
-    fill: currentColor;
-}
-
 /* Input icons */
 .input-icon-wrapper {
     display: flex;
     align-items: center;
     gap: 8px;
     margin-right: 8px;
+    flex-shrink: 0;
 }
 
 .input-icon {
@@ -410,14 +397,23 @@ st.markdown("""
     fill: currentColor;
 }
 
-/* Responsive */
+/* Responsive - FIXED */
 @media (max-width: 768px) {
     .welcome-title {
         font-size: 28px;
     }
     
+    .welcome-subtitle {
+        font-size: 14px;
+    }
+    
     .example-prompts {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
+        gap: 8px;
+    }
+    
+    .example-prompt {
+        padding: 12px;
     }
     
     [data-testid="stChatMessageContent"] {
@@ -427,6 +423,33 @@ st.markdown("""
     
     .stChatInput {
         padding: 12px !important;
+    }
+    
+    .stChatInput > div {
+        padding: 10px 12px;
+    }
+    
+    .chat-header {
+        padding: 10px 12px;
+    }
+    
+    .welcome-container {
+        padding: 20px 16px;
+        min-height: calc(100vh - 150px);
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-title {
+        font-size: 24px;
+    }
+    
+    .example-prompt-title {
+        font-size: 13px;
+    }
+    
+    .example-prompt-desc {
+        font-size: 12px;
     }
 }
 
@@ -450,6 +473,20 @@ st.markdown("""
 
 .stSpinner > div {
     border-color: #10a37f transparent transparent transparent !important;
+}
+
+/* Fix Streamlit default spacing */
+.stChatMessage > div {
+    padding: 0 !important;
+}
+
+/* Ensure proper container alignment */
+[data-testid="stAppViewContainer"] {
+    max-width: 100% !important;
+}
+
+[data-testid="stAppViewContainer"] > div {
+    max-width: 100% !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -615,7 +652,7 @@ st.markdown(f"""
     function injectIcons() {{
         // Add icons to sidebar buttons
         const buttons = document.querySelectorAll('[data-testid="stSidebar"] button');
-        buttons.forEach((btn, idx) => {{
+        buttons.forEach((btn) => {{
             if (!btn.querySelector('.btn-icon-injected')) {{
                 const text = btn.textContent.trim();
                 let iconSvg = '';
@@ -631,7 +668,10 @@ st.markdown(f"""
                     icon.className = 'btn-icon-injected';
                     icon.innerHTML = iconSvg;
                     icon.style.cssText = 'width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; margin-right: 8px; flex-shrink: 0;';
-                    icon.querySelector('svg').style.cssText = 'width: 100%; height: 100%; fill: currentColor;';
+                    const svg = icon.querySelector('svg');
+                    if (svg) {{
+                        svg.style.cssText = 'width: 100%; height: 100%; fill: currentColor;';
+                    }}
                     btn.insertBefore(icon, btn.firstChild);
                 }}
             }}
@@ -663,7 +703,10 @@ st.markdown(f"""
             sendIcon.className = 'send-icon-injected';
             sendIcon.innerHTML = `{ICONS['send']}`;
             sendIcon.style.cssText = 'width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;';
-            sendIcon.querySelector('svg').style.cssText = 'width: 100%; height: 100%; fill: currentColor;';
+            const svg = sendIcon.querySelector('svg');
+            if (svg) {{
+                svg.style.cssText = 'width: 100%; height: 100%; fill: currentColor;';
+            }}
             sendBtn.innerHTML = '';
             sendBtn.appendChild(sendIcon);
         }}
