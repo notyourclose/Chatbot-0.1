@@ -9,13 +9,14 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ChatGPT.com styling with REAL icons
+# Complete ChatGPT.com interface
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Sohne:wght@300;400;500;600;700&display=swap');
 
 * {
     font-family: 'Sohne', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    box-sizing: border-box;
 }
 
 #MainMenu, footer, header { visibility: hidden; }
@@ -23,10 +24,9 @@ st.markdown("""
 
 .stApp {
     background: #343541;
-    overflow: hidden;
 }
 
-/* Sidebar - Exact ChatGPT style */
+/* Sidebar - ChatGPT exact */
 [data-testid="stSidebar"] {
     background: #202123;
     border-right: 1px solid rgba(255,255,255,0.1);
@@ -40,6 +40,7 @@ st.markdown("""
 
 [data-testid="stSidebar"] .stButton {
     width: 100%;
+    margin-bottom: 4px;
 }
 
 [data-testid="stSidebar"] .stButton > button {
@@ -52,11 +53,10 @@ st.markdown("""
     text-align: left;
     font-size: 14px;
     font-weight: 500;
-    transition: background-color 0.2s;
-    margin-bottom: 8px;
+    transition: all 0.2s;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
 }
 
 [data-testid="stSidebar"] .stButton > button:hover {
@@ -74,34 +74,14 @@ st.markdown("""
     margin: 16px 0;
 }
 
-/* Icon styling */
-.icon {
-    width: 16px;
-    height: 16px;
-    display: inline-block;
-    flex-shrink: 0;
-}
-
-.icon svg {
-    width: 100%;
-    height: 100%;
-    stroke: currentColor;
-    fill: none;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}
-
 /* Main container */
 .main .block-container {
     padding: 0;
     max-width: 100%;
     padding-bottom: 140px;
-    height: 100vh;
-    overflow-y: auto;
 }
 
-/* Header bar */
+/* Header */
 .chat-header {
     position: sticky;
     top: 0;
@@ -112,7 +92,6 @@ st.markdown("""
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 0;
 }
 
 .chat-header-title {
@@ -132,7 +111,7 @@ st.markdown("""
     border-radius: 4px;
 }
 
-/* Chat messages - ChatGPT style */
+/* Chat messages */
 .stChatMessage {
     background: transparent !important;
     border: none !important;
@@ -176,7 +155,7 @@ st.markdown("""
     border-radius: 2px;
 }
 
-/* Chat input - Fixed bottom with icons */
+/* Chat input - ChatGPT style */
 .stChatInput {
     position: fixed !important;
     bottom: 0 !important;
@@ -243,46 +222,7 @@ st.markdown("""
     background: rgba(255,255,255,0.1) !important;
 }
 
-.stChatInput button svg {
-    width: 20px;
-    height: 20px;
-}
-
-/* Input field icons */
-.input-icons {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-right: 8px;
-}
-
-.input-icon {
-    width: 20px;
-    height: 20px;
-    color: #8e8ea0;
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.input-icon:hover {
-    color: white;
-    background: rgba(255,255,255,0.1);
-}
-
-.input-icon svg {
-    width: 100%;
-    height: 100%;
-    stroke: currentColor;
-    fill: none;
-    stroke-width: 2;
-}
-
-/* Welcome screen - ChatGPT style */
+/* Welcome screen */
 .welcome-container {
     display: flex;
     flex-direction: column;
@@ -417,15 +357,61 @@ st.markdown("""
     font-size: 12px;
 }
 
+/* Icon buttons */
+.btn-with-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-icon {
+    width: 16px;
+    height: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+}
+
+/* Input icons */
+.input-icon-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: 8px;
+}
+
+.input-icon {
+    width: 20px;
+    height: 20px;
+    color: #8e8ea0;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-icon:hover {
+    color: white;
+    background: rgba(255,255,255,0.1);
+}
+
+.input-icon svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
-    [data-testid="stSidebar"] {
-        position: fixed;
-        z-index: 2000;
-        transform: translateX(-100%);
-        transition: transform 0.3s;
-    }
-    
     .welcome-title {
         font-size: 28px;
     }
@@ -462,26 +448,19 @@ st.markdown("""
     background: rgba(255,255,255,0.3);
 }
 
-/* Loading */
 .stSpinner > div {
     border-color: #10a37f transparent transparent transparent !important;
-}
-
-/* Remove Streamlit default spacing */
-.stChatMessage > div {
-    padding: 0 !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
 # SVG Icons (ChatGPT style)
 ICONS = {
-    "pencil": """<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Zm1.414 1.06a.25.25 0 0 0-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 0 0 0-.354L11.427 2.487ZM11.25 6.25l-1.44-1.44L3.5 11.5l1.44 1.44 6.31-6.69Z"/></svg>""",
-    "trash": """<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.5 1.75a.25.25 0 0 1 .25-.25h2.5a.25.25 0 0 1 .25.25V3h-3V1.75ZM4.784 3.145a.75.75 0 0 1 .606.854L5.25 13.25a1.75 1.75 0 0 0 1.75 1.75h2a1.75 1.75 0 0 0 1.75-1.75l-.14-9.251a.75.75 0 0 1 .606-.854.75.75 0 0 1 .854.606l.14 9.25a3.25 3.25 0 0 1-3.25 3.25h-2a3.25 3.25 0 0 1-3.25-3.25l.14-9.25a.75.75 0 0 1 .854-.606Z"/></svg>""",
-    "plus": """<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.75 2.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z"/></svg>""",
-    "microphone": """<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 1a2.5 2.5 0 0 0-2.5 2.5v4a2.5 2.5 0 0 0 5 0v-4A2.5 2.5 0 0 0 8 1Z"/><path d="M4.5 7.5a3.5 3.5 0 0 0 7 0v-1a.75.75 0 0 1 1.5 0v1a5 5 0 0 1-4.5 4.975V13.5h2a.75.75 0 0 1 0 1.5h-5a.75.75 0 0 1 0-1.5h2v-1.025A5 5 0 0 1 3.5 6.5v-1a.75.75 0 0 1 1.5 0v1Z"/></svg>""",
-    "send": """<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M.5 1.163A1 1 0 0 1 1.97.28l12.868 6.837a1 1 0 0 1 0 1.766L1.969 15.72A1 1 0 0 1 .5 14.836V10.33a1 1 0 0 1 .816-.983L8.5 8 1.316 6.653A1 1 0 0 1 .5 5.67V1.163Z"/></svg>""",
-    "search": """<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 1.75a5.25 5.25 0 1 0 0 10.5 5.25 5.25 0 0 0 0-10.5ZM.25 7a6.75 6.75 0 1 1 12.096 4.12l3.184 3.185a.75.75 0 0 1-1.06 1.06L11.304 12.18A6.75 6.75 0 0 1 .25 7Z"/></svg>""",
+    "pencil": '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Zm1.414 1.06a.25.25 0 0 0-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 0 0 0-.354L11.427 2.487ZM11.25 6.25l-1.44-1.44L3.5 11.5l1.44 1.44 6.31-6.69Z"/></svg>',
+    "trash": '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M6.5 1.75a.25.25 0 0 1 .25-.25h2.5a.25.25 0 0 1 .25.25V3h-3V1.75ZM4.784 3.145a.75.75 0 0 1 .606.854L5.25 13.25a1.75 1.75 0 0 0 1.75 1.75h2a1.75 1.75 0 0 0 1.75-1.75l-.14-9.251a.75.75 0 0 1 .606-.854.75.75 0 0 1 .854.606l.14 9.25a3.25 3.25 0 0 1-3.25 3.25h-2a3.25 3.25 0 0 1-3.25-3.25l.14-9.25a.75.75 0 0 1 .854-.606Z"/></svg>',
+    "plus": '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M8.75 2.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z"/></svg>',
+    "microphone": '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a2.5 2.5 0 0 0-2.5 2.5v4a2.5 2.5 0 0 0 5 0v-4A2.5 2.5 0 0 0 8 1Z"/><path d="M4.5 7.5a3.5 3.5 0 0 0 7 0v-1a.75.75 0 0 1 1.5 0v1a5 5 0 0 1-4.5 4.975V13.5h2a.75.75 0 0 1 0 1.5h-5a.75.75 0 0 1 0-1.5h2v-1.025A5 5 0 0 1 3.5 6.5v-1a.75.75 0 0 1 1.5 0v1Z"/></svg>',
+    "send": '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M.5 1.163A1 1 0 0 1 1.97.28l12.868 6.837a1 1 0 0 1 0 1.766L1.969 15.72A1 1 0 0 1 .5 14.836V10.33a1 1 0 0 1 .816-.983L8.5 8 1.316 6.653A1 1 0 0 1 .5 5.67V1.163Z"/></svg>',
 }
 
 def generate_response(prompt: str) -> str:
@@ -537,7 +516,7 @@ if "messages" not in st.session_state:
 if "chat_count" not in st.session_state:
     st.session_state.chat_count = 0
 
-# Sidebar - ChatGPT style with icons
+# Sidebar - ChatGPT style
 with st.sidebar:
     st.markdown("""
     <div class="sidebar-header">
@@ -569,35 +548,6 @@ with st.sidebar:
         st.session_state.messages = []
         st.session_state.chat_count = 0
         st.rerun()
-    
-    # Inject icons into buttons via JavaScript
-    st.markdown(f"""
-    <script>
-    (function() {{
-        setTimeout(function() {{
-            // Add pencil icon to New Chat button
-            const newChatBtn = document.querySelector('[data-testid="baseButton-primary"]');
-            if (newChatBtn && !newChatBtn.querySelector('.btn-icon')) {{
-                const icon = document.createElement('span');
-                icon.className = 'btn-icon';
-                icon.innerHTML = `{ICONS['pencil']}`;
-                icon.style.cssText = 'width: 16px; height: 16px; display: inline-block; margin-right: 8px; vertical-align: middle;';
-                newChatBtn.insertBefore(icon, newChatBtn.firstChild);
-            }}
-            
-            // Add trash icon to Clear button
-            const clearBtn = document.querySelector('[data-testid="baseButton-secondary"]');
-            if (clearBtn && !clearBtn.querySelector('.btn-icon')) {{
-                const icon = document.createElement('span');
-                icon.className = 'btn-icon';
-                icon.innerHTML = `{ICONS['trash']}`;
-                icon.style.cssText = 'width: 16px; height: 16px; display: inline-block; margin-right: 8px; vertical-align: middle;';
-                clearBtn.insertBefore(icon, clearBtn.firstChild);
-            }}
-        }}, 100);
-    }})();
-    </script>
-    """, unsafe_allow_html=True)
     
     st.markdown("---")
     
@@ -658,43 +608,69 @@ else:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-# Add icons to input field and send button
+# Inject icons into buttons and input field
 st.markdown(f"""
 <script>
 (function() {{
-    function addInputIcons() {{
+    function injectIcons() {{
+        // Add icons to sidebar buttons
+        const buttons = document.querySelectorAll('[data-testid="stSidebar"] button');
+        buttons.forEach((btn, idx) => {{
+            if (!btn.querySelector('.btn-icon-injected')) {{
+                const text = btn.textContent.trim();
+                let iconSvg = '';
+                
+                if (text.includes('New Chat') || text.includes('➕')) {{
+                    iconSvg = `{ICONS['pencil']}`;
+                }} else if (text.includes('Clear') || text.includes('🗑️')) {{
+                    iconSvg = `{ICONS['trash']}`;
+                }}
+                
+                if (iconSvg) {{
+                    const icon = document.createElement('span');
+                    icon.className = 'btn-icon-injected';
+                    icon.innerHTML = iconSvg;
+                    icon.style.cssText = 'width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; margin-right: 8px; flex-shrink: 0;';
+                    icon.querySelector('svg').style.cssText = 'width: 100%; height: 100%; fill: currentColor;';
+                    btn.insertBefore(icon, btn.firstChild);
+                }}
+            }}
+        }});
+        
+        // Add icons to input field
         const inputContainer = document.querySelector('[data-testid=stChatInput] > div');
-        if (inputContainer && !inputContainer.querySelector('.input-icons')) {{
-            const iconsDiv = document.createElement('div');
-            iconsDiv.className = 'input-icons';
-            iconsDiv.innerHTML = `
-                <div class="input-icon" title="Attach file" style="cursor: pointer;">
+        if (inputContainer && !inputContainer.querySelector('.input-icon-wrapper')) {{
+            const iconsWrapper = document.createElement('div');
+            iconsWrapper.className = 'input-icon-wrapper';
+            iconsWrapper.innerHTML = `
+                <div class="input-icon" title="Attach file">
                     {ICONS['plus']}
                 </div>
-                <div class="input-icon" title="Voice input" style="cursor: pointer;">
+                <div class="input-icon" title="Voice input">
                     {ICONS['microphone']}
                 </div>
             `;
             const textarea = inputContainer.querySelector('textarea');
             if (textarea) {{
-                inputContainer.insertBefore(iconsDiv, textarea);
+                inputContainer.insertBefore(iconsWrapper, textarea);
             }}
         }}
         
-        // Add send icon to send button
+        // Replace send button icon
         const sendBtn = document.querySelector('[data-testid=stChatInput] button');
-        if (sendBtn && !sendBtn.querySelector('.send-icon')) {{
+        if (sendBtn && !sendBtn.querySelector('.send-icon-injected')) {{
             const sendIcon = document.createElement('span');
-            sendIcon.className = 'send-icon';
+            sendIcon.className = 'send-icon-injected';
             sendIcon.innerHTML = `{ICONS['send']}`;
-            sendIcon.style.cssText = 'width: 20px; height: 20px; display: inline-block;';
+            sendIcon.style.cssText = 'width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;';
+            sendIcon.querySelector('svg').style.cssText = 'width: 100%; height: 100%; fill: currentColor;';
             sendBtn.innerHTML = '';
             sendBtn.appendChild(sendIcon);
         }}
     }}
     
-    setTimeout(addInputIcons, 100);
-    setInterval(addInputIcons, 500);
+    setTimeout(injectIcons, 100);
+    setInterval(injectIcons, 1000);
 }})();
 </script>
 """, unsafe_allow_html=True)
