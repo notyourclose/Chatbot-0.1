@@ -9,7 +9,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Exact ChatGPT.com styling
+# ChatGPT.com styling with REAL icons
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Sohne:wght@300;400;500;600;700&display=swap');
@@ -72,6 +72,24 @@ st.markdown("""
 [data-testid="stSidebar"] hr {
     border-color: rgba(255,255,255,0.1);
     margin: 16px 0;
+}
+
+/* Icon styling */
+.icon {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 /* Main container */
@@ -158,7 +176,7 @@ st.markdown("""
     border-radius: 2px;
 }
 
-/* Chat input - Fixed bottom like ChatGPT */
+/* Chat input - Fixed bottom with icons */
 .stChatInput {
     position: fixed !important;
     bottom: 0 !important;
@@ -176,8 +194,11 @@ st.markdown("""
     background: #40414f;
     border: 1px solid rgba(255,255,255,0.2);
     border-radius: 12px;
-    padding: 12px;
+    padding: 12px 16px;
     box-shadow: 0 0 0 1px rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .stChatInput textarea {
@@ -190,6 +211,7 @@ st.markdown("""
     line-height: 1.5;
     min-height: 24px;
     max-height: 200px;
+    flex: 1;
 }
 
 .stChatInput textarea::placeholder {
@@ -206,15 +228,58 @@ st.markdown("""
     border: none !important;
     color: #8e8ea0 !important;
     padding: 4px !important;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    transition: all 0.2s;
 }
 
 .stChatInput button:hover {
     color: white !important;
+    background: rgba(255,255,255,0.1) !important;
 }
 
 .stChatInput button svg {
     width: 20px;
     height: 20px;
+}
+
+/* Input field icons */
+.input-icons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: 8px;
+}
+
+.input-icon {
+    width: 20px;
+    height: 20px;
+    color: #8e8ea0;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-icon:hover {
+    color: white;
+    background: rgba(255,255,255,0.1);
+}
+
+.input-icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
 }
 
 /* Welcome screen - ChatGPT style */
@@ -409,6 +474,16 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# SVG Icons (ChatGPT style)
+ICONS = {
+    "pencil": """<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Zm1.414 1.06a.25.25 0 0 0-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 0 0 0-.354L11.427 2.487ZM11.25 6.25l-1.44-1.44L3.5 11.5l1.44 1.44 6.31-6.69Z"/></svg>""",
+    "trash": """<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.5 1.75a.25.25 0 0 1 .25-.25h2.5a.25.25 0 0 1 .25.25V3h-3V1.75ZM4.784 3.145a.75.75 0 0 1 .606.854L5.25 13.25a1.75 1.75 0 0 0 1.75 1.75h2a1.75 1.75 0 0 0 1.75-1.75l-.14-9.251a.75.75 0 0 1 .606-.854.75.75 0 0 1 .854.606l.14 9.25a3.25 3.25 0 0 1-3.25 3.25h-2a3.25 3.25 0 0 1-3.25-3.25l.14-9.25a.75.75 0 0 1 .854-.606Z"/></svg>""",
+    "plus": """<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.75 2.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z"/></svg>""",
+    "microphone": """<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 1a2.5 2.5 0 0 0-2.5 2.5v4a2.5 2.5 0 0 0 5 0v-4A2.5 2.5 0 0 0 8 1Z"/><path d="M4.5 7.5a3.5 3.5 0 0 0 7 0v-1a.75.75 0 0 1 1.5 0v1a5 5 0 0 1-4.5 4.975V13.5h2a.75.75 0 0 1 0 1.5h-5a.75.75 0 0 1 0-1.5h2v-1.025A5 5 0 0 1 3.5 6.5v-1a.75.75 0 0 1 1.5 0v1Z"/></svg>""",
+    "send": """<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M.5 1.163A1 1 0 0 1 1.97.28l12.868 6.837a1 1 0 0 1 0 1.766L1.969 15.72A1 1 0 0 1 .5 14.836V10.33a1 1 0 0 1 .816-.983L8.5 8 1.316 6.653A1 1 0 0 1 .5 5.67V1.163Z"/></svg>""",
+    "search": """<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 1.75a5.25 5.25 0 1 0 0 10.5 5.25 5.25 0 0 0 0-10.5ZM.25 7a6.75 6.75 0 1 1 12.096 4.12l3.184 3.185a.75.75 0 0 1-1.06 1.06L11.304 12.18A6.75 6.75 0 0 1 .25 7Z"/></svg>""",
+}
+
 def generate_response(prompt: str) -> str:
     """Generate AI response using HuggingFace API or fallback"""
     try:
@@ -462,7 +537,7 @@ if "messages" not in st.session_state:
 if "chat_count" not in st.session_state:
     st.session_state.chat_count = 0
 
-# Sidebar - ChatGPT style
+# Sidebar - ChatGPT style with icons
 with st.sidebar:
     st.markdown("""
     <div class="sidebar-header">
@@ -473,6 +548,16 @@ with st.sidebar:
                 <div style="color: rgba(255,255,255,0.6); font-size: 12px;">by Kavishka Dileepa</div>
             </div>
         </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # New Chat button with pencil icon
+    st.markdown(f"""
+    <div style="margin-bottom: 8px;">
+        <button onclick="window.location.reload()" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; padding: 12px; width: 100%; text-align: left; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background-color 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
+            <span class="icon">{ICONS['pencil']}</span>
+            <span>New Chat</span>
+        </button>
     </div>
     """, unsafe_allow_html=True)
     
@@ -489,6 +574,16 @@ with st.sidebar:
         st.markdown("**Current Conversation**")
     
     st.markdown("---")
+    
+    # Clear button with trash icon
+    st.markdown(f"""
+    <div style="margin-bottom: 8px;">
+        <button onclick="document.querySelector('[data-testid=baseButton-secondary]').click()" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; padding: 12px; width: 100%; text-align: left; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background-color 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
+            <span class="icon">{ICONS['trash']}</span>
+            <span>Clear All Chats</span>
+        </button>
+    </div>
+    """, unsafe_allow_html=True)
     
     if st.button("🗑️ Clear All Chats", use_container_width=True, key="clear_chat"):
         st.session_state.messages = []
@@ -553,6 +648,33 @@ else:
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
+
+# Add icons to input field
+st.markdown(f"""
+<script>
+(function() {{
+    setTimeout(function() {{
+        const inputContainer = document.querySelector('[data-testid=stChatInput] > div');
+        if (inputContainer && !inputContainer.querySelector('.input-icons')) {{
+            const iconsDiv = document.createElement('div');
+            iconsDiv.className = 'input-icons';
+            iconsDiv.innerHTML = `
+                <div class="input-icon" title="Attach file">
+                    {ICONS['plus']}
+                </div>
+                <div class="input-icon" title="Voice input">
+                    {ICONS['microphone']}
+                </div>
+            `;
+            const textarea = inputContainer.querySelector('textarea');
+            if (textarea) {{
+                inputContainer.insertBefore(iconsDiv, textarea);
+            }}
+        }}
+    }}, 100);
+}})();
+</script>
+""", unsafe_allow_html=True)
 
 # Chat input
 if prompt := st.chat_input("Message AI Chatbot..."):
