@@ -388,7 +388,7 @@ def generate_response(prompt):
     try:
         if "HF_TOKEN" in st.secrets:
             API_URL = "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill"
-            headers = {"Authorization": f"Bearer {st.secrets['HF_TOKEN']}"}
+            headers = {"Authorization": f"Bearer {st.secrets['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']}"}
             payload = {"inputs": prompt, "parameters": {"max_length": 100, "temperature": 0.7}}
             response = requests.post(API_URL, headers=headers, json=payload, timeout=30)
             if response.status_code == 200:
