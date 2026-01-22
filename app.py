@@ -551,16 +551,6 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
     
-    # New Chat button with pencil icon
-    st.markdown(f"""
-    <div style="margin-bottom: 8px;">
-        <button onclick="window.location.reload()" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; padding: 12px; width: 100%; text-align: left; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background-color 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
-            <span class="icon">{ICONS['pencil']}</span>
-            <span>New Chat</span>
-        </button>
-    </div>
-    """, unsafe_allow_html=True)
-    
     if st.button("➕ New Chat", use_container_width=True, key="new_chat"):
         st.session_state.messages = []
         st.session_state.chat_count += 1
@@ -575,20 +565,39 @@ with st.sidebar:
     
     st.markdown("---")
     
-    # Clear button with trash icon
-    st.markdown(f"""
-    <div style="margin-bottom: 8px;">
-        <button onclick="document.querySelector('[data-testid=baseButton-secondary]').click()" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; padding: 12px; width: 100%; text-align: left; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background-color 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
-            <span class="icon">{ICONS['trash']}</span>
-            <span>Clear All Chats</span>
-        </button>
-    </div>
-    """, unsafe_allow_html=True)
-    
     if st.button("🗑️ Clear All Chats", use_container_width=True, key="clear_chat"):
         st.session_state.messages = []
         st.session_state.chat_count = 0
         st.rerun()
+    
+    # Inject icons into buttons via JavaScript
+    st.markdown(f"""
+    <script>
+    (function() {{
+        setTimeout(function() {{
+            // Add pencil icon to New Chat button
+            const newChatBtn = document.querySelector('[data-testid="baseButton-primary"]');
+            if (newChatBtn && !newChatBtn.querySelector('.btn-icon')) {{
+                const icon = document.createElement('span');
+                icon.className = 'btn-icon';
+                icon.innerHTML = `{ICONS['pencil']}`;
+                icon.style.cssText = 'width: 16px; height: 16px; display: inline-block; margin-right: 8px; vertical-align: middle;';
+                newChatBtn.insertBefore(icon, newChatBtn.firstChild);
+            }}
+            
+            // Add trash icon to Clear button
+            const clearBtn = document.querySelector('[data-testid="baseButton-secondary"]');
+            if (clearBtn && !clearBtn.querySelector('.btn-icon')) {{
+                const icon = document.createElement('span');
+                icon.className = 'btn-icon';
+                icon.innerHTML = `{ICONS['trash']}`;
+                icon.style.cssText = 'width: 16px; height: 16px; display: inline-block; margin-right: 8px; vertical-align: middle;';
+                clearBtn.insertBefore(icon, clearBtn.firstChild);
+            }}
+        }}, 100);
+    }})();
+    </script>
+    """, unsafe_allow_html=True)
     
     st.markdown("---")
     
@@ -649,20 +658,20 @@ else:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-# Add icons to input field
+# Add icons to input field and send button
 st.markdown(f"""
 <script>
 (function() {{
-    setTimeout(function() {{
+    function addInputIcons() {{
         const inputContainer = document.querySelector('[data-testid=stChatInput] > div');
         if (inputContainer && !inputContainer.querySelector('.input-icons')) {{
             const iconsDiv = document.createElement('div');
             iconsDiv.className = 'input-icons';
             iconsDiv.innerHTML = `
-                <div class="input-icon" title="Attach file">
+                <div class="input-icon" title="Attach file" style="cursor: pointer;">
                     {ICONS['plus']}
                 </div>
-                <div class="input-icon" title="Voice input">
+                <div class="input-icon" title="Voice input" style="cursor: pointer;">
                     {ICONS['microphone']}
                 </div>
             `;
@@ -671,7 +680,21 @@ st.markdown(f"""
                 inputContainer.insertBefore(iconsDiv, textarea);
             }}
         }}
-    }}, 100);
+        
+        // Add send icon to send button
+        const sendBtn = document.querySelector('[data-testid=stChatInput] button');
+        if (sendBtn && !sendBtn.querySelector('.send-icon')) {{
+            const sendIcon = document.createElement('span');
+            sendIcon.className = 'send-icon';
+            sendIcon.innerHTML = `{ICONS['send']}`;
+            sendIcon.style.cssText = 'width: 20px; height: 20px; display: inline-block;';
+            sendBtn.innerHTML = '';
+            sendBtn.appendChild(sendIcon);
+        }}
+    }}
+    
+    setTimeout(addInputIcons, 100);
+    setInterval(addInputIcons, 500);
 }})();
 </script>
 """, unsafe_allow_html=True)
