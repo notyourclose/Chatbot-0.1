@@ -1,6 +1,7 @@
-streamlit
+streamlit~=1.53.0
 transformers
 torch
 pillow
 accelerate
 sentencepiece
+requests~=2.32.5

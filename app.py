@@ -1,10 +1,10 @@
 import streamlit as st
-from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
-import torch
+import requests
+import json
 
 # Page config with custom theme
 st.set_page_config(
-    page_title="AI Chatbot | Knavish Dileepa",
+    page_title="AI Chatbot | Kavishka Dileepa",
     page_icon="🤖",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -265,23 +265,51 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-@st.cache_resource
-def load_chatbot():
-    tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium")
-    model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-medium")
-    return tokenizer, model
+# Function to call Hugging Face API
+def generate_response(prompt, conversation_history):
+    API_URL = "https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium"
 
+    # Get HF token from secrets (you'll need to add this in Streamlit Cloud)
+    try:
+        headers = {"Authorization": f"Bearer {st.secrets['HF_TOKEN']}"}
+    except:
+        # Fallback: Use without token (may hit rate limits)
+        headers = {}
 
-# Show welcome message or load model
-if "model_loaded" not in st.session_state:
-    with st.spinner("🚀 Loading AI model... This may take a moment"):
-        tokenizer, model = load_chatbot()
-        st.session_state.tokenizer = tokenizer
-        st.session_state.model = model
-        st.session_state.model_loaded = True
-else:
-    tokenizer = st.session_state.tokenizer
-    model = st.session_state.model
+    # Build conversation context
+    context = "\n".join([f"{msg['role']}: {msg['content']}" for msg in conversation_history[-6:]])
+    full_prompt = f"{context}\nuser: {prompt}\nassistant:"
+
+    payload = {
+        "inputs": full_prompt,
+        "parameters": {
+            "max_new_tokens": 100,
+            "temperature": 0.8,
+            "top_p": 0.9,
+            "do_sample": True
+        }
+    }
+
+    try:
+        response = requests.post(API_URL, headers=headers, json=payload, timeout=30)
+
+        if response.status_code == 200:
+            result = response.json()
+            if isinstance(result, list) and len(result) > 0:
+                generated_text = result[0].get('generated_text', '')
+                # Extract only the assistant's response
+                if 'assistant:' in generated_text:
+                    assistant_response = generated_text.split('assistant:')[-1].strip()
+                    return assistant_response if assistant_response else "I'm here to help! Could you rephrase that?"
+                return generated_text
+            return "I'm processing your request. Please try again!"
+        elif response.status_code == 503:
+            return "⏳ The AI model is loading. Please wait a moment and try again!"
+        else:
+            return "I'm having trouble connecting. Please try again!"
+    except Exception as e:
+        return "Sorry, I encountered an error. Please try again!"
+
 
 # Initialize chat history
 if "messages" not in st.session_state:
@@ -299,9 +327,6 @@ Feel free to ask me anything! Let's start chatting."""
 
     st.session_state.messages.append({"role": "assistant", "content": welcome_msg})
 
-if "chat_history_ids" not in st.session_state:
-    st.session_state.chat_history_ids = None
-
 # Display chat messages
 for message in st.session_state.messages:
     with st.chat_message(message["role"], avatar="👤" if message["role"] == "user" else "🤖"):
@@ -317,32 +342,7 @@ if prompt := st.chat_input("💬 Type your message here..."):
     # Generate bot response
     with st.chat_message("assistant", avatar="🤖"):
         with st.spinner("Thinking..."):
-            # Encode the new user input
-            new_input_ids = tokenizer.encode(prompt + tokenizer.eos_token, return_tensors='pt')
-
-            # Append to chat history
-            bot_input_ids = torch.cat([st.session_state.chat_history_ids, new_input_ids],
-                                      dim=-1) if st.session_state.chat_history_ids is not None else new_input_ids
-
-            # Generate response
-            st.session_state.chat_history_ids = model.generate(
-                bot_input_ids,
-                max_length=1000,
-                pad_token_id=tokenizer.eos_token_id,
-                no_repeat_ngram_size=3,
-                do_sample=True,
-                top_k=100,
-                top_p=0.7,
-                temperature=0.8
-            )
-
-            # Decode response
-            response = tokenizer.decode(st.session_state.chat_history_ids[:, bot_input_ids.shape[-1]:][0],
-                                        skip_special_tokens=True)
-
-            if not response.strip():
-                response = "I'm here to help! Could you please rephrase your question?"
-
+            response = generate_response(prompt, st.session_state.messages)
             st.markdown(response)
 
     st.session_state.messages.append({"role": "assistant", "content": response})
@@ -371,7 +371,6 @@ with st.sidebar:
 
     if st.button("🔄 Clear Chat History", use_container_width=True):
         st.session_state.messages = []
-        st.session_state.chat_history_ids = None
         st.rerun()
 
     st.markdown("---")
