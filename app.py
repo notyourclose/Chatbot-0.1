@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 import json
+import time
 
 # Page config with custom theme
 st.set_page_config(
@@ -265,50 +266,72 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# Function to call Hugging Face API
+# Function to generate AI response using multiple fallback options
 def generate_response(prompt, conversation_history):
-    API_URL = "https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium"
-
-    # Get HF token from secrets (you'll need to add this in Streamlit Cloud)
+    # Try Method 1: Hugging Face API with token
     try:
-        headers = {"Authorization": f"Bearer {st.secrets['HF_TOKEN']}"}
-    except:
-        # Fallback: Use without token (may hit rate limits)
-        headers = {}
+        if "HF_TOKEN" in st.secrets:
+            API_URL = "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill"
+            headers = {"Authorization": f"Bearer {st.secrets['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']}"}
 
-    # Build conversation context
-    context = "\n".join([f"{msg['role']}: {msg['content']}" for msg in conversation_history[-6:]])
-    full_prompt = f"{context}\nuser: {prompt}\nassistant:"
+            payload = {
+                "inputs": prompt,
+                "parameters": {
+                    "max_length": 100,
+                    "temperature": 0.7
+                }
+            }
 
-    payload = {
-        "inputs": full_prompt,
-        "parameters": {
-            "max_new_tokens": 100,
-            "temperature": 0.8,
-            "top_p": 0.9,
-            "do_sample": True
-        }
-    }
+            response = requests.post(API_URL, headers=headers, json=payload, timeout=30)
 
+            if response.status_code == 200:
+                result = response.json()
+                if isinstance(result, list) and len(result) > 0:
+                    return result[0].get('generated_text', '').strip()
+    except Exception as e:
+        pass
+
+    # Try Method 2: Hugging Face API without token (public endpoint)
     try:
-        response = requests.post(API_URL, headers=headers, json=payload, timeout=30)
+        API_URL = "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill"
+        payload = {"inputs": prompt}
+
+        response = requests.post(API_URL, headers={}, json=payload, timeout=30)
 
         if response.status_code == 200:
             result = response.json()
             if isinstance(result, list) and len(result) > 0:
-                generated_text = result[0].get('generated_text', '')
-                # Extract only the assistant's response
-                if 'assistant:' in generated_text:
-                    assistant_response = generated_text.split('assistant:')[-1].strip()
-                    return assistant_response if assistant_response else "I'm here to help! Could you rephrase that?"
-                return generated_text
-            return "I'm processing your request. Please try again!"
+                return result[0].get('generated_text', '').strip()
         elif response.status_code == 503:
-            return "⏳ The AI model is loading. Please wait a moment and try again!"
-        else:
-            return "I'm having trouble connecting. Please try again!"
+            # Model is loading
+            time.sleep(2)
+            response = requests.post(API_URL, headers={}, json=payload, timeout=30)
+            if response.status_code == 200:
+                result = response.json()
+                if isinstance(result, list) and len(result) > 0:
+                    return result[0].get('generated_text', '').strip()
     except Exception as e:
-        return "Sorry, I encountered an error. Please try again!"
+        pass
+
+    # Fallback Method 3: Simple rule-based responses
+    prompt_lower = prompt.lower()
+
+    if any(word in prompt_lower for word in ['hello', 'hi', 'hey', 'greetings']):
+        return "Hello! How can I help you today?"
+    elif any(word in prompt_lower for word in ['how are you', 'how r u', 'whats up']):
+        return "I'm doing great, thank you for asking! I'm here to help you with any questions you have."
+    elif any(word in prompt_lower for word in ['your name', 'who are you', 'what are you']):
+        return "I'm an AI chatbot created by Kavishka Dileepa. I'm here to assist you with information and have conversations!"
+    elif any(word in prompt_lower for word in ['bye', 'goodbye', 'see you']):
+        return "Goodbye! It was nice chatting with you. Come back anytime!"
+    elif any(word in prompt_lower for word in ['thank', 'thanks']):
+        return "You're welcome! Happy to help! 😊"
+    elif any(word in prompt_lower for word in ['help', 'what can you do']):
+        return "I can help you with various things like answering questions, having conversations, providing information, and more. Just ask me anything!"
+    elif '?' in prompt:
+        return f"That's an interesting question about '{prompt[:50]}...'. While I'm currently in a limited mode, I'm designed to help answer questions and have conversations. Could you try rephrasing your question?"
+    else:
+        return "I understand you're saying something about that. I'm currently using a simplified response system. For better AI responses, please add your Hugging Face token in Streamlit Secrets. How else can I help you?"
 
 
 # Initialize chat history
@@ -323,7 +346,9 @@ if "messages" not in st.session_state:
 🎯 Providing information and insights
 🤝 Being your friendly chat companion
 
-Feel free to ask me anything! Let's start chatting."""
+Feel free to ask me anything! Let's start chatting.
+
+*💡 Tip: For enhanced AI responses, add your Hugging Face token in Streamlit Cloud Secrets!*"""
 
     st.session_state.messages.append({"role": "assistant", "content": welcome_msg})
 
@@ -366,6 +391,15 @@ with st.sidebar:
         • Be specific<br>
         • Use natural language<br>
         • Have fun chatting!</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class="feature-card">
+        <h3>🔑 Setup for Full AI</h3>
+        <p><strong>Optional:</strong> Add HF_TOKEN in Streamlit Secrets for advanced AI responses.<br><br>
+        Without token: Basic rule-based chat<br>
+        With token: Full AI-powered chat</p>
     </div>
     """, unsafe_allow_html=True)
 
