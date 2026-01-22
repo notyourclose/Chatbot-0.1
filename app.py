@@ -9,14 +9,13 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ChatGPT-style CSS - Clean, responsive, modern
+# Exact ChatGPT.com styling
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sohne:wght@300;400;500;600;700&display=swap');
 
-* { 
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    box-sizing: border-box;
+* {
+    font-family: 'Sohne', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
 #MainMenu, footer, header { visibility: hidden; }
@@ -24,50 +23,102 @@ st.markdown("""
 
 .stApp {
     background: #343541;
+    overflow: hidden;
 }
 
-/* Sidebar - ChatGPT style */
+/* Sidebar - Exact ChatGPT style */
 [data-testid="stSidebar"] {
     background: #202123;
-    border-right: 1px solid #444654;
+    border-right: 1px solid rgba(255,255,255,0.1);
     min-width: 260px !important;
+    max-width: 320px !important;
 }
 
-[data-testid="stSidebar"] .stButton button {
+[data-testid="stSidebar"] > div:first-child {
+    padding: 8px;
+}
+
+[data-testid="stSidebar"] .stButton {
+    width: 100%;
+}
+
+[data-testid="stSidebar"] .stButton > button {
     background: transparent;
-    border: 1px solid #444654;
+    border: 1px solid rgba(255,255,255,0.2);
     color: white;
     border-radius: 8px;
-    padding: 12px 16px;
+    padding: 12px;
     width: 100%;
     text-align: left;
     font-size: 14px;
     font-weight: 500;
-    transition: all 0.2s;
+    transition: background-color 0.2s;
     margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-[data-testid="stSidebar"] .stButton button:hover {
-    background: #2a2b32;
-    border-color: #565869;
+[data-testid="stSidebar"] .stButton > button:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.3);
 }
 
 [data-testid="stSidebar"] .stMarkdown {
     color: rgba(255,255,255,0.8);
+    font-size: 13px;
+}
+
+[data-testid="stSidebar"] hr {
+    border-color: rgba(255,255,255,0.1);
+    margin: 16px 0;
 }
 
 /* Main container */
 .main .block-container {
     padding: 0;
     max-width: 100%;
-    padding-bottom: 120px;
+    padding-bottom: 140px;
+    height: 100vh;
+    overflow-y: auto;
 }
 
-/* Chat messages */
+/* Header bar */
+.chat-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #343541;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0;
+}
+
+.chat-header-title {
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chat-header-model {
+    color: rgba(255,255,255,0.6);
+    font-size: 12px;
+    padding: 4px 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+}
+
+/* Chat messages - ChatGPT style */
 .stChatMessage {
     background: transparent !important;
     border: none !important;
-    padding: 20px 0 !important;
+    padding: 0 !important;
     margin: 0 !important;
 }
 
@@ -85,32 +136,37 @@ st.markdown("""
     line-height: 1.75;
     max-width: 768px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 24px 16px;
+    word-wrap: break-word;
 }
 
 [data-testid="stChatMessageAvatarAssistant"] {
-    background: linear-gradient(135deg, #10a37f 0%, #1a7f64 100%);
+    background: #10a37f;
     width: 30px;
     height: 30px;
-    margin-right: 12px;
+    margin-right: 16px;
+    margin-left: 16px;
+    border-radius: 2px;
 }
 
 [data-testid="stChatMessageAvatarUser"] {
-    background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+    background: #5436da;
     width: 30px;
     height: 30px;
-    margin-left: 12px;
+    margin-left: 16px;
+    margin-right: 16px;
+    border-radius: 2px;
 }
 
-/* Chat input - Fixed at bottom */
+/* Chat input - Fixed bottom like ChatGPT */
 .stChatInput {
     position: fixed !important;
     bottom: 0 !important;
     left: 0 !important;
     right: 0 !important;
     background: #343541 !important;
-    border-top: 1px solid #444654 !important;
-    padding: 20px !important;
+    border-top: 1px solid rgba(255,255,255,0.1) !important;
+    padding: 16px !important;
     z-index: 1000 !important;
 }
 
@@ -118,9 +174,10 @@ st.markdown("""
     max-width: 768px;
     margin: 0 auto;
     background: #40414f;
-    border: 1px solid #565869;
+    border: 1px solid rgba(255,255,255,0.2);
     border-radius: 12px;
-    padding: 4px;
+    padding: 12px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.05);
 }
 
 .stChatInput textarea {
@@ -128,8 +185,11 @@ st.markdown("""
     border: none !important;
     color: white !important;
     font-size: 16px !important;
-    padding: 12px 16px !important;
+    padding: 0 !important;
     resize: none !important;
+    line-height: 1.5;
+    min-height: 24px;
+    max-height: 200px;
 }
 
 .stChatInput textarea::placeholder {
@@ -145,13 +205,19 @@ st.markdown("""
     background: transparent !important;
     border: none !important;
     color: #8e8ea0 !important;
+    padding: 4px !important;
 }
 
 .stChatInput button:hover {
     color: white !important;
 }
 
-/* Welcome screen */
+.stChatInput button svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Welcome screen - ChatGPT style */
 .welcome-container {
     display: flex;
     flex-direction: column;
@@ -164,29 +230,17 @@ st.markdown("""
     margin: 0 auto;
 }
 
-.welcome-icon {
-    width: 64px;
-    height: 64px;
-    background: linear-gradient(135deg, #10a37f 0%, #1a7f64 100%);
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 32px;
-    margin-bottom: 24px;
-    box-shadow: 0 8px 24px rgba(16, 163, 127, 0.3);
-}
-
 .welcome-title {
     color: white;
-    font-size: 32px;
+    font-size: 36px;
     font-weight: 600;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     line-height: 1.2;
+    letter-spacing: -0.02em;
 }
 
 .welcome-subtitle {
-    color: #acacbe;
+    color: rgba(236,236,241,0.8);
     font-size: 16px;
     margin-bottom: 32px;
     line-height: 1.6;
@@ -194,7 +248,7 @@ st.markdown("""
 
 .example-prompts {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
     width: 100%;
     max-width: 768px;
@@ -202,45 +256,78 @@ st.markdown("""
 }
 
 .example-prompt {
-    background: #40414f;
-    border: 1px solid #565869;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: 12px;
     padding: 16px;
     text-align: left;
     cursor: pointer;
     transition: all 0.2s;
     color: white;
-    font-size: 14px;
 }
 
 .example-prompt:hover {
-    background: #4a4b5a;
-    border-color: #10a37f;
-    transform: translateY(-2px);
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.2);
+}
+
+.example-prompt-icon {
+    font-size: 20px;
+    margin-bottom: 8px;
+    display: block;
 }
 
 .example-prompt-title {
     font-weight: 600;
     margin-bottom: 4px;
     color: white;
+    font-size: 14px;
 }
 
 .example-prompt-desc {
-    color: #acacbe;
+    color: rgba(236,236,241,0.6);
     font-size: 13px;
     line-height: 1.5;
 }
 
-/* Sidebar content */
-.sidebar-section {
-    padding: 12px 16px;
-    color: rgba(255,255,255,0.6);
+/* Sidebar styling */
+.sidebar-header {
+    padding: 8px;
+    margin-bottom: 8px;
+}
+
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.sidebar-logo-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #10a37f 0%, #1a7f64 100%);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 800;
+    font-size: 16px;
+}
+
+.sidebar-section-title {
+    padding: 8px 12px;
+    color: rgba(255,255,255,0.5);
     font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-top: 16px;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
 
 .sidebar-footer {
@@ -249,26 +336,33 @@ st.markdown("""
     left: 0;
     right: 0;
     padding: 16px;
-    border-top: 1px solid #444654;
+    border-top: 1px solid rgba(255,255,255,0.1);
     text-align: center;
-    color: rgba(255,255,255,0.5);
-    font-size: 12px;
 }
 
-.sidebar-footer strong {
+.sidebar-footer-text {
+    color: rgba(255,255,255,0.5);
+    font-size: 12px;
+    margin: 0;
+}
+
+.sidebar-footer-name {
     color: #10a37f;
     font-weight: 600;
+    font-size: 12px;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
     [data-testid="stSidebar"] {
-        min-width: 0 !important;
-        width: 100% !important;
+        position: fixed;
+        z-index: 2000;
+        transform: translateX(-100%);
+        transition: transform 0.3s;
     }
     
     .welcome-title {
-        font-size: 24px;
+        font-size: 28px;
     }
     
     .example-prompts {
@@ -277,17 +371,12 @@ st.markdown("""
     
     [data-testid="stChatMessageContent"] {
         font-size: 15px;
-        padding: 0 16px;
+        padding: 20px 12px;
     }
     
     .stChatInput {
-        padding: 16px !important;
+        padding: 12px !important;
     }
-}
-
-/* Loading spinner */
-.stSpinner > div {
-    border-color: #10a37f transparent transparent transparent !important;
 }
 
 /* Scrollbar */
@@ -300,12 +389,22 @@ st.markdown("""
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #565869;
+    background: rgba(255,255,255,0.2);
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #6e6f7f;
+    background: rgba(255,255,255,0.3);
+}
+
+/* Loading */
+.stSpinner > div {
+    border-color: #10a37f transparent transparent transparent !important;
+}
+
+/* Remove Streamlit default spacing */
+.stChatMessage > div {
+    padding: 0 !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -363,12 +462,12 @@ if "messages" not in st.session_state:
 if "chat_count" not in st.session_state:
     st.session_state.chat_count = 0
 
-# Sidebar
+# Sidebar - ChatGPT style
 with st.sidebar:
     st.markdown("""
-    <div style="padding: 16px 0;">
-        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
-            <div style="width: 32px; height: 32px; border-radius: 10px; background: linear-gradient(135deg, #10a37f 0%, #1a7f64 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 18px;">AI</div>
+    <div class="sidebar-header">
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-icon">AI</div>
             <div>
                 <div style="color: white; font-size: 14px; font-weight: 600;">AI Chatbot</div>
                 <div style="color: rgba(255,255,255,0.6); font-size: 12px;">by Kavishka Dileepa</div>
@@ -382,7 +481,7 @@ with st.sidebar:
         st.session_state.chat_count += 1
         st.rerun()
     
-    st.markdown('<div class="sidebar-section">Recent Chats</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-section-title">Recent</div>', unsafe_allow_html=True)
     
     if st.session_state.chat_count > 0:
         st.markdown(f"**Chat #{st.session_state.chat_count}**")
@@ -400,37 +499,51 @@ with st.sidebar:
     
     st.markdown("""
     <div class="sidebar-footer">
-        <p style="margin: 0 0 4px 0;">Made with ❤️ by</p>
-        <p style="margin: 0;"><strong>Kavishka Dileepa</strong></p>
-        <p style="margin: 8px 0 0 0; font-size: 11px;">© 2026 All rights reserved</p>
+        <p class="sidebar-footer-text">Made with ❤️ by</p>
+        <p class="sidebar-footer-name">Kavishka Dileepa</p>
+        <p class="sidebar-footer-text" style="margin-top: 8px;">© 2026 All rights reserved</p>
     </div>
     """, unsafe_allow_html=True)
+
+# Header bar
+st.markdown("""
+<div class="chat-header">
+    <div class="chat-header-title">
+        <span>🤖</span>
+        <span>AI Chatbot</span>
+    </div>
+    <div class="chat-header-model">GPT-3.5</div>
+</div>
+""", unsafe_allow_html=True)
 
 # Main chat area
 if len(st.session_state.messages) == 0:
     st.markdown("""
     <div class="welcome-container">
-        <div class="welcome-icon">🤖</div>
         <div class="welcome-title">How can I help you today?</div>
         <div class="welcome-subtitle">
             I'm here to answer questions, provide information, and have conversations. 
-            Just type your message below or try one of these examples:
+            Try one of these examples:
         </div>
         <div class="example-prompts">
-            <div class="example-prompt" onclick="document.querySelector('[data-testid=stChatInput] textarea').value='Can you explain quantum physics in simple terms?'; document.querySelector('[data-testid=stChatInput] textarea').dispatchEvent(new Event('input', {bubbles: true}));">
-                <div class="example-prompt-title">💡 Explain concepts</div>
+            <div class="example-prompt" onclick="const textarea = document.querySelector('[data-testid=stChatInput] textarea'); if(textarea) { textarea.value='Can you explain quantum physics in simple terms?'; textarea.dispatchEvent(new Event('input', {bubbles: true})); }">
+                <span class="example-prompt-icon">💡</span>
+                <div class="example-prompt-title">Explain concepts</div>
                 <div class="example-prompt-desc">Break down complex topics into easy-to-understand explanations</div>
             </div>
-            <div class="example-prompt" onclick="document.querySelector('[data-testid=stChatInput] textarea').value='What can you help me with?'; document.querySelector('[data-testid=stChatInput] textarea').dispatchEvent(new Event('input', {bubbles: true}));">
-                <div class="example-prompt-title">⚡ Quick answers</div>
-                <div class="example-prompt-desc">Get fast and accurate responses to your questions</div>
+            <div class="example-prompt" onclick="const textarea = document.querySelector('[data-testid=stChatInput] textarea'); if(textarea) { textarea.value='What can you help me with?'; textarea.dispatchEvent(new Event('input', {bubbles: true})); }">
+                <span class="example-prompt-icon">⚡</span>
+                <div class="example-prompt-title">Get quick answers</div>
+                <div class="example-prompt-desc">Fast and accurate responses to your questions</div>
             </div>
-            <div class="example-prompt" onclick="document.querySelector('[data-testid=stChatInput] textarea').value='Teach me something interesting about space'; document.querySelector('[data-testid=stChatInput] textarea').dispatchEvent(new Event('input', {bubbles: true}));">
-                <div class="example-prompt-title">📚 Learn something new</div>
+            <div class="example-prompt" onclick="const textarea = document.querySelector('[data-testid=stChatInput] textarea'); if(textarea) { textarea.value='Teach me something interesting about space'; textarea.dispatchEvent(new Event('input', {bubbles: true})); }">
+                <span class="example-prompt-icon">📚</span>
+                <div class="example-prompt-title">Learn something new</div>
                 <div class="example-prompt-desc">Explore any subject with detailed information</div>
             </div>
-            <div class="example-prompt" onclick="document.querySelector('[data-testid=stChatInput] textarea').value='Let\\'s chat about technology trends'; document.querySelector('[data-testid=stChatInput] textarea').dispatchEvent(new Event('input', {bubbles: true}));">
-                <div class="example-prompt-title">💬 Have a conversation</div>
+            <div class="example-prompt" onclick="const textarea = document.querySelector('[data-testid=stChatInput] textarea'); if(textarea) { textarea.value='Let\\'s chat about technology trends'; textarea.dispatchEvent(new Event('input', {bubbles: true})); }">
+                <span class="example-prompt-icon">💬</span>
+                <div class="example-prompt-title">Have a conversation</div>
                 <div class="example-prompt-desc">Natural dialogue on any topic you're interested in</div>
             </div>
         </div>
